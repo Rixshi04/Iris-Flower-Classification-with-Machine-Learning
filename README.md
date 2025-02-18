@@ -97,7 +97,7 @@ A comparison of model performances is provided in the final report, highlighting
 - Deploying the model using Flask or FastAPI.
 
 ## Contributors
-- Your Name (@yourgithub)
+- Your Name (@Rixshi04)
 
 ## License
 This project is licensed under the MIT License.
