@@ -1,104 +1,97 @@
 # Iris Flower Classification with Machine Learning
 
 ## Overview
-This project focuses on classifying Iris flowers into three species (*Setosa*, *Versicolor*, and *Virginica*) using machine learning techniques. The dataset used is the popular **Iris dataset**, which contains features such as sepal length, sepal width, petal length, and petal width.
+This project classifies Iris flowers into three species — *Setosa*, *Versicolor*, and *Virginica* — using a K-Nearest Neighbors (KNN) classifier with standardized features.
+
+The project uses the built-in scikit-learn Iris dataset, so no external dataset download is required.
 
 ## Dataset
-The dataset consists of 150 samples with four features:
-- **Sepal Length (cm)**
-- **Sepal Width (cm)**
-- **Petal Length (cm)**
-- **Petal Width (cm)**
-- **Species** (Target Variable: Setosa, Versicolor, Virginica)
+The Iris dataset contains 150 samples with four input features:
+- Sepal length (cm)
+- Sepal width (cm)
+- Petal length (cm)
+- Petal width (cm)
+
+The target contains three species:
+- Setosa
+- Versicolor
+- Virginica
 
 ## Project Workflow
-1. **Data Preprocessing**: Load and analyze the dataset.
-2. **Data Visualization**: Explore relationships between features.
-3. **Model Training**: Train various machine learning models.
-4. **Model Evaluation**: Assess performance using accuracy and other metrics.
-5. **Predictions**: Make predictions on new data.
-6. **Model Saving**: Save the trained model for future use.
+1. Load the Iris dataset from scikit-learn.
+2. Split the data into training and testing sets.
+3. Fit a `StandardScaler` on the training data.
+4. Transform the training and test features using the fitted scaler.
+5. Train a KNN classifier with `n_neighbors=3`.
+6. Evaluate the classifier using accuracy, classification report, and confusion matrix.
+7. Save the fitted scaler and KNN model together in one reusable artifact.
 
-## Dependencies
-Ensure you have the following dependencies installed before running the project:
+## Installation
+Install the required dependencies:
+
 ```bash
-pip install numpy pandas scikit-learn joblib
+python -m pip install numpy pandas scikit-learn joblib
 ```
 
 ## How to Run
-1. Clone this repository:
-   ```bash
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd iris-flower-classification
-   ```
-3. Run the Python script:
-   ```bash
-   python iris_classification.py
-   ```
+From the repository root:
 
-## Model Used
-The project implements the **K-Nearest Neighbors (KNN)** classifier with standardized features.
+```bash
+python iris.py
+```
 
-## Code Implementation
+The script prints the evaluation metrics and creates:
+
+```text
+iris_knn_pipeline.pkl
+```
+
+## Reusable Model Artifact
+The saved `iris_knn_pipeline.pkl` contains:
+- `scaler` — the fitted `StandardScaler`
+- `model` — the fitted `KNeighborsClassifier`
+- `target_names` — Iris class names
+- `feature_names` — feature names used by the model
+
+Saving the scaler together with the classifier is important because new input data must be transformed using the same scaling parameters learned from the training data.
+
+Example:
+
 ```python
-import numpy as np
-import pandas as pd
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
 
-# Load dataset
-iris = load_iris()
-X = iris.data
-y = iris.target
+artifact = joblib.load("iris_knn_pipeline.pkl")
 
-# Split dataset
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+scaler = artifact["scaler"]
+model = artifact["model"]
+target_names = artifact["target_names"]
 
-# Standardize features
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+new_flower = [[5.1, 3.5, 1.4, 0.2]]
+new_flower_scaled = scaler.transform(new_flower)
 
-# Train KNN model
-knn = KNeighborsClassifier(n_neighbors=3)
-knn.fit(X_train, y_train)
-
-# Make predictions
-y_pred = knn.predict(X_test)
-
-# Evaluate model
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("Classification Report:\n", classification_report(y_test, y_pred))
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
-
-# Save the model
-joblib.dump(knn, 'iris_knn_model.pkl')
+prediction = model.predict(new_flower_scaled)[0]
+print("Predicted species:", target_names[prediction])
 ```
 
 ## Evaluation Metrics
-The model is evaluated using:
-- **Accuracy Score**
-- **Confusion Matrix**
-- **Precision, Recall, and F1-score**
+The training script reports:
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- Confusion matrix
 
-## Results
-A comparison of model performances is provided in the final report, highlighting the most effective algorithm for this dataset.
+## Model
+The project uses **K-Nearest Neighbors (KNN)** with standardized input features.
 
 ## Future Improvements
-- Implementing deep learning models.
-- Hyperparameter tuning for better accuracy.
-- Deploying the model using Flask or FastAPI.
+- Hyperparameter tuning for KNN.
+- Cross-validation.
+- A small prediction API using Flask or FastAPI.
+- A web interface for entering flower measurements.
 
 ## Contributors
 - Rishi (@Rixshi04)
 
 ## License
 This project is licensed under the MIT License.
-
